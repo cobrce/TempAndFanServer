@@ -17,6 +17,8 @@ namespace TempAndFanServer {
         
         private Terminal.Gui.ColorScheme greyOnBlack;
         
+        private Terminal.Gui.ColorScheme blueOnBlack;
+        
         private Terminal.Gui.Window windowStats;
         
         private Terminal.Gui.FrameView frameViewCPU;
@@ -59,7 +61,12 @@ namespace TempAndFanServer {
         
         private Terminal.Gui.Label label8;
         
+        private Terminal.Gui.StatusBar statusBar;
+        
+        private Terminal.Gui.StatusItem ctrlQToQuit;
+        
         private void InitializeComponent() {
+            this.statusBar = new Terminal.Gui.StatusBar();
             this.label8 = new Terminal.Gui.Label();
             this.label7 = new Terminal.Gui.Label();
             this.windowAbout = new Terminal.Gui.Window();
@@ -87,12 +94,18 @@ namespace TempAndFanServer {
             this.greyOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
             this.greyOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
             this.greyOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
+            this.blueOnBlack = new Terminal.Gui.ColorScheme();
+            this.blueOnBlack.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Black);
+            this.blueOnBlack.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.Black);
+            this.blueOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.BrightYellow);
+            this.blueOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.BrightYellow);
+            this.blueOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Black);
             this.Width = Dim.Fill(0);
             this.Height = Dim.Fill(0);
             this.X = 0;
             this.Y = 0;
             this.Visible = true;
-            this.ColorScheme = this.greyOnBlack;
+            this.ColorScheme = this.blueOnBlack;
             this.Modal = false;
             this.IsMdiContainer = false;
             this.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
@@ -106,7 +119,7 @@ namespace TempAndFanServer {
             this.windowStats.X = 4;
             this.windowStats.Y = 2;
             this.windowStats.Visible = true;
-            this.windowStats.ColorScheme = this.greyOnBlack;
+            this.windowStats.ColorScheme = this.blueOnBlack;
             this.windowStats.Modal = false;
             this.windowStats.IsMdiContainer = false;
             this.windowStats.Data = "windowStats";
@@ -248,7 +261,7 @@ namespace TempAndFanServer {
             this.windowLog.X = 57;
             this.windowLog.Y = 2;
             this.windowLog.Visible = true;
-            this.windowLog.ColorScheme = this.greyOnBlack;
+            this.windowLog.ColorScheme = this.blueOnBlack;
             this.windowLog.Modal = false;
             this.windowLog.IsMdiContainer = false;
             this.windowLog.Data = "windowLog";
@@ -291,7 +304,7 @@ namespace TempAndFanServer {
             this.chkScroll.Y = 14;
             this.chkScroll.Visible = true;
             this.chkScroll.Data = "chkScroll";
-            this.chkScroll.Text = "Scroll";
+            this.chkScroll.Text = "S_croll";
             this.chkScroll.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.chkScroll.Checked = true;
             this.windowLog.Add(this.chkScroll);
@@ -300,7 +313,7 @@ namespace TempAndFanServer {
             this.windowAbout.X = 11;
             this.windowAbout.Y = 14;
             this.windowAbout.Visible = true;
-            this.windowAbout.ColorScheme = this.greyOnBlack;
+            this.windowAbout.ColorScheme = this.blueOnBlack;
             this.windowAbout.Modal = false;
             this.windowAbout.IsMdiContainer = false;
             this.windowAbout.Data = "windowAbout";
@@ -329,6 +342,18 @@ namespace TempAndFanServer {
             this.label8.Text = "By Cob_258 (github.com/cobrce)";
             this.label8.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.windowAbout.Add(this.label8);
+            this.statusBar.Width = Dim.Fill(0);
+            this.statusBar.Height = 1;
+            this.statusBar.X = 0;
+            this.statusBar.Y = Pos.AnchorEnd(1);
+            this.statusBar.Visible = true;
+            this.statusBar.Data = "statusBar";
+            this.statusBar.Text = "";
+            this.statusBar.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.ctrlQToQuit = new Terminal.Gui.StatusItem(((Terminal.Gui.Key)(1048588u)), "Ctrl+Q to quit", null);
+            this.statusBar.Items = new Terminal.Gui.StatusItem[] {
+                    this.ctrlQToQuit};
+            this.Add(this.statusBar);
         }
     }
 }

@@ -35,6 +35,7 @@ namespace TempAndFanServer
             server.OnGetData += hardwareMonitor.GetStats;
             StartServer(null);
 
+            chkSendFan.Toggled += (b) => { server.ShortFormat = b; };
         }
 
         const string hwdescFileName = "hwdesc.json";
@@ -119,12 +120,12 @@ namespace TempAndFanServer
         {
             window.Enter += (args) =>
             {
-                BringToFront(window);
+                Application.MainLoop.Invoke(() => BringToFront(window));
             };
 
             window.MouseClick += (args) =>
             {
-                BringToFront(window);
+                Application.MainLoop.Invoke(() => BringToFront(window));
             };
         }
 

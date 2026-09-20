@@ -19,10 +19,12 @@ namespace TempAndFanServer
                 Buffer.BlockCopy(BitConverter.GetBytes(CpuFan / 100.0f), 0, bytes, 8, 4);
                 Buffer.BlockCopy(BitConverter.GetBytes(GpuFan / 100.0f), 0, bytes, 12, 4);
                 Buffer.BlockCopy(BitConverter.GetBytes(Fps / 100.0f), 0, bytes, 16, 4);
+
                 return bytes;
             }
         }
 
+        public bool ShortFormat { get; set; } = false;
         private readonly string host = host;
         public readonly int port = port;
         private Data data = new(0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -70,8 +72,7 @@ namespace TempAndFanServer
                     break;
                 }
 
-
-                await stream.WriteAsync(data.GetBytes(), token);
+                await stream.WriteAsync(data.GetBytes().AsMemory(0, ShortFormat ? 2 * 4 : 5 * 4), token);
                 await stream.FlushAsync(token);
 
                 byte[] acknowledge = new byte[1];
