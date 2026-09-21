@@ -41,7 +41,7 @@ namespace TempAndFanServer
         }
 
 
-        private Computer computer = new Computer() { IsCpuEnabled = true, IsGpuEnabled = true, IsMotherboardEnabled = true };
+        private readonly Computer computer = new() { IsCpuEnabled = true, IsGpuEnabled = true, IsMotherboardEnabled = true };
         public HardwareMonitor(HardwareDescriptor hardwareDescriptor)
         {
             hwDescriptor = hardwareDescriptor;
@@ -92,26 +92,43 @@ namespace TempAndFanServer
                 )
             );
         }
-        private float ReadHardwareSensor(SensorDescrpitor sensorDescrpitor)
+        private ISensor? SelectSensor(SensorDescrpitor sensorDescrpitor)
         {
-            foreach (var hardware in computer.Hardware )
+            ISensor? sensor;
+            foreach (var hardware in computer.Hardware)
             {
                 hardware.Update();
 
-                var sensor = SelectSensor(hardware.Sensors, sensorDescrpitor);
-                if (sensor !=null)
-                    return (sensor.Value != null) ? (float)sensor.Value : 0.0f;
+                sensor = SelectSensor(hardware.Sensors, sensorDescrpitor);
+                if (sensor != null)
+                    return sensor;
 
-                foreach( var subhardware in hardware.SubHardware)
+                foreach (var subhardware in hardware.SubHardware)
                 {
                     subhardware.Update();
 
                     sensor = SelectSensor(subhardware.Sensors, sensorDescrpitor);
-                    if (sensor !=null)
-                        return (sensor.Value != null) ? (float)sensor.Value : 0.0f;
+                    if (sensor != null)
+                        return sensor;
                 }
             }
-            return 0.0f;
+
+            return null;
+        }
+
+        private readonly Dictionary<SensorDescrpitor,ISensor> sensorsDictionary = [];
+        private float ReadHardwareSensor(SensorDescrpitor sensorDescrpitor,bool cached = true)
+        {
+            if (cached && sensorsDictionary.TryGetValue(sensorDescrpitor, out ISensor? sensor) && sensor != null)
+            {
+                sensor.Hardware.Update();
+                return (float)(sensor.Value ?? 0.0f);
+            }
+
+            sensor = SelectSensor(sensorDescrpitor);
+            if(sensor!=null)
+                sensorsDictionary[sensorDescrpitor] = sensor;
+            return (float)((sensor?.Value) ?? 0.0);
         }
 
         public Server.Data GetStats()
