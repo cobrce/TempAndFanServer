@@ -71,15 +71,20 @@ namespace TempAndFanServer {
         
         private Terminal.Gui.Label lblSensorValue;
         
-        private Terminal.Gui.Button button;
+        private Terminal.Gui.Button btnWindowSensorSelect;
+        
+        private Terminal.Gui.Button btnWindowSensorCancel;
         
         private Terminal.Gui.StatusBar statusBar;
         
         private Terminal.Gui.StatusItem ctrlQToQuit;
         
+        private Terminal.Gui.StatusItem clickOnAStatToSelectItsSensor;
+        
         private void InitializeComponent() {
             this.statusBar = new Terminal.Gui.StatusBar();
-            this.button = new Terminal.Gui.Button();
+            this.btnWindowSensorCancel = new Terminal.Gui.Button();
+            this.btnWindowSensorSelect = new Terminal.Gui.Button();
             this.lblSensorValue = new Terminal.Gui.Label();
             this.label6 = new Terminal.Gui.Label();
             this.treeSensors = new Terminal.Gui.TreeView();
@@ -176,7 +181,7 @@ namespace TempAndFanServer {
             this.lblCPUTemp.Y = 0;
             this.lblCPUTemp.Visible = true;
             this.lblCPUTemp.Data = "lblCPUTemp";
-            this.lblCPUTemp.Text = "40 °C";
+            this.lblCPUTemp.Text = "-- °C";
             this.lblCPUTemp.TextAlignment = Terminal.Gui.TextAlignment.Right;
             this.frameViewCPU.Add(this.lblCPUTemp);
             this.label2.Width = 4;
@@ -188,13 +193,13 @@ namespace TempAndFanServer {
             this.label2.Text = "Fan  :";
             this.label2.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.frameViewCPU.Add(this.label2);
-            this.lblCPUFan.Width = 4;
+            this.lblCPUFan.Width = 3;
             this.lblCPUFan.Height = 1;
             this.lblCPUFan.X = 14;
             this.lblCPUFan.Y = 2;
             this.lblCPUFan.Visible = true;
             this.lblCPUFan.Data = "lblCPUFan";
-            this.lblCPUFan.Text = "50 %";
+            this.lblCPUFan.Text = "-- %";
             this.lblCPUFan.TextAlignment = Terminal.Gui.TextAlignment.Right;
             this.frameViewCPU.Add(this.lblCPUFan);
             this.frameViewGPU.Width = 24;
@@ -225,7 +230,7 @@ namespace TempAndFanServer {
             this.lblGPUTemp.Y = 0;
             this.lblGPUTemp.Visible = true;
             this.lblGPUTemp.Data = "lblGPUTemp";
-            this.lblGPUTemp.Text = "40 °C";
+            this.lblGPUTemp.Text = "-- °C";
             this.lblGPUTemp.TextAlignment = Terminal.Gui.TextAlignment.Right;
             this.frameViewGPU.Add(this.lblGPUTemp);
             this.label4.Width = 4;
@@ -243,7 +248,7 @@ namespace TempAndFanServer {
             this.lblGPUFan.Y = 2;
             this.lblGPUFan.Visible = true;
             this.lblGPUFan.Data = "lblGPUFan";
-            this.lblGPUFan.Text = "50 %";
+            this.lblGPUFan.Text = "-- %";
             this.lblGPUFan.TextAlignment = Terminal.Gui.TextAlignment.Right;
             this.frameViewGPU.Add(this.lblGPUFan);
             this.label5.Width = 5;
@@ -421,16 +426,26 @@ namespace TempAndFanServer {
             this.lblSensorValue.Text = "";
             this.lblSensorValue.TextAlignment = Terminal.Gui.TextAlignment.Right;
             this.windowSensors.Add(this.lblSensorValue);
-            this.button.Width = 8;
-            this.button.Height = 1;
-            this.button.X = 75;
-            this.button.Y = 16;
-            this.button.Visible = true;
-            this.button.Data = "button";
-            this.button.Text = "Cancel";
-            this.button.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.button.IsDefault = false;
-            this.windowSensors.Add(this.button);
+            this.btnWindowSensorSelect.Width = 8;
+            this.btnWindowSensorSelect.Height = 1;
+            this.btnWindowSensorSelect.X = 64;
+            this.btnWindowSensorSelect.Y = 16;
+            this.btnWindowSensorSelect.Visible = true;
+            this.btnWindowSensorSelect.Data = "btnWindowSensorSelect";
+            this.btnWindowSensorSelect.Text = "Select";
+            this.btnWindowSensorSelect.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.btnWindowSensorSelect.IsDefault = false;
+            this.windowSensors.Add(this.btnWindowSensorSelect);
+            this.btnWindowSensorCancel.Width = 8;
+            this.btnWindowSensorCancel.Height = 1;
+            this.btnWindowSensorCancel.X = 75;
+            this.btnWindowSensorCancel.Y = 16;
+            this.btnWindowSensorCancel.Visible = true;
+            this.btnWindowSensorCancel.Data = "btnWindowSensorCancel";
+            this.btnWindowSensorCancel.Text = "Cancel";
+            this.btnWindowSensorCancel.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.btnWindowSensorCancel.IsDefault = false;
+            this.windowSensors.Add(this.btnWindowSensorCancel);
             this.statusBar.Width = Dim.Fill(0);
             this.statusBar.Height = 1;
             this.statusBar.X = 0;
@@ -440,8 +455,10 @@ namespace TempAndFanServer {
             this.statusBar.Text = "";
             this.statusBar.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.ctrlQToQuit = new Terminal.Gui.StatusItem(((Terminal.Gui.Key)(1048588u)), "Ctrl+Q to quit", null);
+            this.clickOnAStatToSelectItsSensor = new Terminal.Gui.StatusItem(((Terminal.Gui.Key)(0u)), "Click on a stat to select its sensor", null);
             this.statusBar.Items = new Terminal.Gui.StatusItem[] {
-                    this.ctrlQToQuit};
+                    this.ctrlQToQuit,
+                    this.clickOnAStatToSelectItsSensor};
             this.Add(this.statusBar);
         }
     }

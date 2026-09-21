@@ -11,7 +11,15 @@ namespace TempAndFanServer
 {
     public class HardwareMonitor
     {
-        public record SensorDescrpitor(string HardwareType, string SensorType, string SensorName);
+        public record SensorDescrpitor(string HardwareType, string SensorType, string SensorName)
+        {
+            public static SensorDescrpitor FromSensor(ISensor sensor)
+            {
+                return new SensorDescrpitor(sensor.Hardware.HardwareType.ToString(),
+                sensor.SensorType.ToString(),
+                sensor.Name);
+            }
+        }
         public record HardwareDescriptor(
             SensorDescrpitor CpuTempDescriptor,
             SensorDescrpitor GpuTempDescriptor,

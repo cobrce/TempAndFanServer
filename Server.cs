@@ -59,6 +59,7 @@ namespace TempAndFanServer
             var stream = client.GetStream();
             stream.ReadTimeout = 1000;
             stream.WriteTimeout = 1000;
+            int errorCounter = 0;
 
             OnLog?.Invoke($"New connection with {endpoint}");
 
@@ -72,13 +73,23 @@ namespace TempAndFanServer
                     break;
                 }
 
-                await stream.WriteAsync(data.GetBytes().AsMemory(0, ShortFormat ? 2 * 4 : 5 * 4), token);
-                await stream.FlushAsync(token);
-
-                byte[] acknowledge = new byte[1];
-                if (0 == await stream.ReadAsync(acknowledge.AsMemory(0, 1), token))
-                    break;
-
+                try
+                {
+                    await stream.WriteAsync(data.GetBytes().AsMemory(0, ShortFormat ? 2 * 4 : 5 * 4), token);
+                    await stream.FlushAsync(token);
+                    byte[] acknowledge = new byte[1];
+                    if (0 == await stream.ReadAsync(acknowledge.AsMemory(0, 1), token))
+                        break;
+                    
+                    errorCounter = 0;
+                }
+                catch
+                {
+                    if (++errorCounter == 10)
+                        break;
+                    OnLog?.Invoke($"Error N° {errorCounter} with client {endpoint}, retrying..");
+                    await Task.Delay(500, token);
+                }
                 await Task.Delay(10,token);
             }
             client.Close();

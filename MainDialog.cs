@@ -9,9 +9,11 @@
 // -----------------------------------------------------------------------------
 namespace TempAndFanServer
 {
+    using System.ComponentModel;
     using System.IO.Pipes;
     using System.Security.Cryptography.X509Certificates;
     using System.Text.Json;
+    using BlackSharp.Core.Extensions;
     using OpenHardwareMonitor.Hardware;
     using Terminal.Gui;
     using Terminal.Gui.Trees;
@@ -40,23 +42,131 @@ namespace TempAndFanServer
 
             PopulateSensorsTree();
             treeSensors.SelectionChanged+= SensorSelected;
+            windowSensors.Visible = false;
+            windowSensors.Modal = true;
+
+            btnWindowSensorCancel.Clicked += (() => { treeSensors.SelectedObject = null; ShowSensorWindow(false); });
+            btnWindowSensorSelect.Clicked += (() => { if (treeSensors.SelectedObject != null) ShowSensorWindow(false); });
+            lblCPUTemp.Clicked += SelectCPUTempSensor;
+            lblCPUFan.Clicked += SelectCPUFanSensor;
+            lblGPUTemp.Clicked += SelectGPUTempSensor;
+            lblGPUFan.Clicked += SelectGpuFanSensor;
+        }
+        
+
+        private void SelectSensorInTreeView(HardwareMonitor.SensorDescrpitor descrpitor)
+        {
+            List<ITreeNode> nodes = new();
+            nodes.AddRange(treeSensors.Objects);
+
+            for (int i =0 ;i<nodes.Count();i++)
+                nodes.AddRange(nodes[i].Children);
+
+            foreach (var treeNode in nodes)
+            {
+                if (treeNode.Tag is ISensor sensor
+                && sensor.Hardware.HardwareType.ToString() == descrpitor.HardwareType
+                && sensor.SensorType.ToString() == descrpitor.SensorType
+                && (descrpitor.SensorName == "" || sensor.Name == descrpitor.SensorName))
+                {
+                    treeSensors.SelectedObject = treeNode;
+                    return;
+                }
+            }
+
+        }
+
+
+        // CPU temperature sensor
+        private void SelectCPUTempSensor()
+        {
+            SelectSensorInTreeView(hardwareMonitor.CpuTempDescriptor);
+            ShowSensorWindow(true);
+            windowSensors.VisibleChanged+= SelectCPUTempSensorEnd;
+        }
+
+        private void SelectCPUTempSensorEnd()
+        {
+            windowSensors.VisibleChanged-= SelectCPUTempSensorEnd;
+            if (treeSensors.SelectedObject!=null)
+                hardwareMonitor.CpuTempDescriptor = HardwareMonitor.SensorDescrpitor.FromSensor((ISensor)treeSensors.SelectedObject.Tag);
+        }
+
+        // CPU fan sensor
+
+        private void SelectCPUFanSensor()
+        {
+            SelectSensorInTreeView(hardwareMonitor.CpuFanDescriptor);
+            ShowSensorWindow(true);
+            windowSensors.VisibleChanged+= SelectCPUFanSensorEnd;
+        }
+
+
+        private void SelectCPUFanSensorEnd()
+        {
+            windowSensors.VisibleChanged-= SelectCPUFanSensorEnd;
+            if (treeSensors.SelectedObject!=null)
+                hardwareMonitor.CpuFanDescriptor = HardwareMonitor.SensorDescrpitor.FromSensor((ISensor)treeSensors.SelectedObject.Tag);
+        }
+
+        // GPU temperature sensor
+        private void SelectGPUTempSensor()
+        {
+            SelectSensorInTreeView(hardwareMonitor.GpuTempDescriptor);
+            ShowSensorWindow(true);
+            windowSensors.VisibleChanged+= SelectGPUTempSensorEnd;
+        }
+
+        private void SelectGPUTempSensorEnd()
+        {
+            windowSensors.VisibleChanged-= SelectGPUTempSensorEnd;
+            if (treeSensors.SelectedObject!=null)
+                hardwareMonitor.GpuTempDescriptor = HardwareMonitor.SensorDescrpitor.FromSensor((ISensor)treeSensors.SelectedObject.Tag);
+        }
+
+        // GPU fan sensor
+        private void SelectGpuFanSensor()
+        {
+            SelectSensorInTreeView(hardwareMonitor.GpuFanDescriptor);
+            ShowSensorWindow(true);
+            windowSensors.VisibleChanged+= SelectGpuFanSensorEnd;
+        }
+
+        private void SelectGpuFanSensorEnd()
+        {
+            windowSensors.VisibleChanged-=SelectGpuFanSensorEnd;
+            if (treeSensors.SelectedObject!=null)
+                hardwareMonitor.GpuFanDescriptor = HardwareMonitor.SensorDescrpitor.FromSensor((ISensor)treeSensors.SelectedObject.Tag);
+            ShowSensorWindow(false);
+        }
+
+        void ShowSensorWindow(bool visible)
+        {
+            windowAbout.Enabled = !visible;
+            windowStats.Enabled = !visible;
+            windowLog.Enabled = !visible;
+
+            windowSensors.Enabled = visible;
+            windowSensors.Visible = visible;
+            windowSensors.X = Pos.Center();
+            windowSensors.Y = Pos.Center();
+            if (visible)
+            {
+                Application.MainLoop.Invoke(() => BringToFront(windowSensors));
+                windowSensors.FocusFirst();
+            }
         }
 
         private void SensorSelected(object sender, SelectionChangedEventArgs<ITreeNode> e)
         {
-       
-            var elementOffset = treeSensors.GetScrollOffsetOf(e.NewValue);
-            treeSensors.GetCurrentHeight(out int currentHeight);
-
-            if (elementOffset < treeSensors.ScrollOffsetVertical)
-                treeSensors.ScrollOffsetVertical = elementOffset;
-
-            if (elementOffset >= treeSensors.ScrollOffsetVertical + currentHeight - 1)
-                treeSensors.ScrollOffsetVertical = elementOffset - currentHeight + 2;
+            treeSensors.SelectedObject = e.NewValue;
+            treeSensors.ExpandAll();
+            treeSensors.EnsureVisible(e.NewValue);
         }
 
         void PopulateSensorsTree()
         {
+            treeSensors.Height = Dim.Fill();
             var hardware = hardwareMonitor.GetAllHardware();
 
             Dictionary<string,List<string[]>> treeElements =  new();
@@ -74,12 +184,12 @@ namespace TempAndFanServer
                 treeSensors.AddObject(root);
                 foreach (var subhardware in hw.SubHardware)
                 {
-                    root =new (){Text = subhardware.HardwareType.ToString()};
+                    TreeNode subhwNode =new (){Text = subhardware.HardwareType.ToString()};
                     foreach (var sensor in subhardware.Sensors)
                     {
-                        AddSensorsToRoot(root,typeNodes,sensor);
+                        AddSensorsToRoot(subhwNode,typeNodes,sensor);
                     }
-                    treeSensors.AddObject(root);
+                    root.Children.Add(subhwNode);
                 }
             }
         }
