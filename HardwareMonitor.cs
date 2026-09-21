@@ -1,7 +1,10 @@
 
 
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices.Marshalling;
+using System.Text;
 using System.Text.Json;
+using Microsoft.VisualBasic;
 using OpenHardwareMonitor.Hardware;
 
 namespace TempAndFanServer
@@ -22,6 +25,8 @@ namespace TempAndFanServer
                 new SensorDescrpitor("SuperIO", "Control", "Fan #2"),
                 new SensorDescrpitor("GpuNvidia", "Control", "GPU Fan 1")
                 );
+            private string? FileName;
+
             public static bool LoadFromFile(string fileName, out HardwareDescriptor hardwareDescriptor)
             {
                 hardwareDescriptor =  Default;
@@ -34,9 +39,30 @@ namespace TempAndFanServer
                 if (result!=null)
                 {
                     hardwareDescriptor = result;
+                    hardwareDescriptor.FileName = fileName;
                     return true;
                 }
                 return false;
+            }
+
+            internal bool SaveToFile(string? fileName = null)
+            {
+                try
+                {
+                    if (fileName != null)
+                        FileName = fileName;
+                    if (FileName == null)
+                        return false;
+                    string serialized = JsonSerializer.Serialize(this);
+                    using var stream = File.Open(FileName, FileMode.OpenOrCreate, FileAccess.Write);
+                    stream.SetLength(0);
+                    stream.Write(Encoding.UTF8.GetBytes(serialized));
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -50,7 +76,11 @@ namespace TempAndFanServer
         }
 
         private Server.Data cachedData = new(0, 0, 0, 0, 0);
-        private readonly HardwareDescriptor hwDescriptor;
+        private HardwareDescriptor hwDescriptor;
+        public SensorDescrpitor CpuTempDescriptor { get => hwDescriptor.CpuTempDescriptor; set { hwDescriptor = hwDescriptor with { CpuTempDescriptor = value }; hwDescriptor.SaveToFile(); } }
+        public SensorDescrpitor GpuTempDescriptor { get => hwDescriptor.GpuTempDescriptor; set { hwDescriptor = hwDescriptor with { GpuTempDescriptor = value }; hwDescriptor.SaveToFile(); } }
+        public SensorDescrpitor CpuFanDescriptor { get => hwDescriptor.CpuFanDescriptor; set { hwDescriptor = hwDescriptor with { CpuFanDescriptor = value }; hwDescriptor.SaveToFile(); } }
+        public SensorDescrpitor GpuFanDescriptor { get => hwDescriptor.GpuFanDescriptor; set { hwDescriptor = hwDescriptor with { GpuFanDescriptor = value }; hwDescriptor.SaveToFile(); } }
 
         private async void GetStatsAsync()
         {
@@ -114,6 +144,20 @@ namespace TempAndFanServer
             }
 
             return null;
+        }
+
+        public IList<IHardware> GetAllHardware()
+        {
+            foreach (var hardware in computer.Hardware)
+            {
+                hardware.Update();
+                foreach(var subhardware in hardware.SubHardware)
+                {
+                    subhardware.Update(); 
+                }
+
+            }
+            return computer.Hardware;
         }
 
         private readonly Dictionary<SensorDescrpitor,ISensor> sensorsDictionary = [];

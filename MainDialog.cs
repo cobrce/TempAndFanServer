@@ -12,8 +12,9 @@ namespace TempAndFanServer
     using System.IO.Pipes;
     using System.Security.Cryptography.X509Certificates;
     using System.Text.Json;
+    using OpenHardwareMonitor.Hardware;
     using Terminal.Gui;
-
+    using Terminal.Gui.Trees;
 
     public partial class MainDialog
     {
@@ -36,6 +37,62 @@ namespace TempAndFanServer
             StartServer(null);
 
             chkSendFan.Toggled += (b) => { server.ShortFormat = b; };
+
+            PopulateSensorsTree();
+            treeSensors.SelectionChanged+= SensorSelected;
+        }
+
+        private void SensorSelected(object sender, SelectionChangedEventArgs<ITreeNode> e)
+        {
+       
+            var elementOffset = treeSensors.GetScrollOffsetOf(e.NewValue);
+            treeSensors.GetCurrentHeight(out int currentHeight);
+
+            if (elementOffset < treeSensors.ScrollOffsetVertical)
+                treeSensors.ScrollOffsetVertical = elementOffset;
+
+            if (elementOffset >= treeSensors.ScrollOffsetVertical + currentHeight - 1)
+                treeSensors.ScrollOffsetVertical = elementOffset - currentHeight + 2;
+        }
+
+        void PopulateSensorsTree()
+        {
+            var hardware = hardwareMonitor.GetAllHardware();
+
+            Dictionary<string,List<string[]>> treeElements =  new();
+
+            treeSensors.RemoveAll();
+
+            foreach(var hw in hardware)
+            {
+                TreeNode root = new(){Text = hw.HardwareType.ToString()};
+                Dictionary<string, TreeNode> typeNodes = new();
+                foreach(var sensor in hw.Sensors)
+                {
+                    AddSensorsToRoot(root, typeNodes, sensor);
+                }
+                treeSensors.AddObject(root);
+                foreach (var subhardware in hw.SubHardware)
+                {
+                    root =new (){Text = subhardware.HardwareType.ToString()};
+                    foreach (var sensor in subhardware.Sensors)
+                    {
+                        AddSensorsToRoot(root,typeNodes,sensor);
+                    }
+                    treeSensors.AddObject(root);
+                }
+            }
+        }
+
+        private static void AddSensorsToRoot(TreeNode root, Dictionary<string, TreeNode> typeNodes, ISensor sensor)
+        {
+            if (!typeNodes.TryGetValue(sensor.SensorType.ToString(), out TreeNode typeNode))
+            {
+                typeNode = new TreeNode() { Text = sensor.SensorType.ToString() };
+                root.Children.Add(typeNode);
+            }
+            typeNode.Children.Add(new TreeNode() { Text = sensor.Name, Tag = sensor });
+            typeNodes[sensor.SensorType.ToString()] = typeNode;
         }
 
         const string hwdescFileName = "hwdesc.json";
@@ -63,14 +120,31 @@ namespace TempAndFanServer
             return HardwareMonitor.HardwareDescriptor.Default;
         }
 
+
+        private ScrollBarView CreateScrollBar(View view)
+        {
+            ScrollBarView scrollBar = new ScrollBarView(logView, true, true);
+            view.Add(scrollBar);
+            scrollBar.ChangedPosition += () =>
+            {
+                view.SetNeedsDisplay();
+            };
+
+            view.DrawContent += (e) =>
+            {
+                scrollBar.Size = logView.Source.Count - 1;
+                scrollBar.Position = logView.TopItem;
+                scrollBar.Refresh();
+            };
+            return scrollBar;
+        }
         private void InitScrollableLogView()
         {
             logView.Source = new Terminal.Gui.ListWrapper(LogList);
             logView.Height = Dim.Fill();
             logView.Width = Dim.Fill();
 
-            ScrollBarView scrollBar = new ScrollBarView(logView, true, true);
-            frameViewLog.Add(scrollBar);
+            var scrollBar = CreateScrollBar(logView);
 
             scrollBar.MouseClick += (e) =>
             {
@@ -86,13 +160,6 @@ namespace TempAndFanServer
             {
                 logView.TopItem = scrollBar.Position;
                 logView.SetNeedsDisplay();
-            };
-
-            logView.DrawContent += (e) =>
-            {
-                scrollBar.Size = logView.Source.Count - 1;
-                scrollBar.Position = logView.TopItem;
-                scrollBar.Refresh();
             };
         }
 
@@ -138,19 +205,67 @@ namespace TempAndFanServer
 
         private bool Update_TimerTick(MainLoop loop)
         {
-            UpdateStats(
-                hardwareMonitor.GetStats()
-            );
+            Application.MainLoop.Invoke(() =>
+            {
+                UpdateStats(
+                    hardwareMonitor.GetStats()
+                );
+                UpdatedSelectedSensor();
+            });
             return true;
+        }
+
+        private void UpdatedSelectedSensor()
+        {
+            if (treeSensors.SelectedObject?.Tag is ISensor sensor)
+            {
+                sensor.Hardware.Update();
+                string unit ="";
+
+                switch(sensor.SensorType )
+                {
+                    case SensorType.Clock:
+                        unit = "MHz";
+                        break;
+                    case SensorType.Control:
+                        unit = "%";
+                        break;
+                    case SensorType.Load:
+                        unit = "%";
+                        break;
+                    case SensorType.Temperature:
+                        unit = "°C";
+                        break;
+                    case SensorType.Voltage:
+                        unit ="V";
+                        break;
+                    case SensorType.Power:
+                        unit = "W";
+                        break;
+                    case SensorType.Fan:
+                        unit = "RPM";
+                        break;
+                    default:
+                        unit = "";
+                        break;
+                };
+
+                lblSensorValue.Text = $"{(sensor.Value):0.00} {unit}";
+            }
+            else
+            {
+                lblSensorValue.Text = "";
+            }
+
         }
 
         private void UpdateStats(Server.Data data)
         {
-            lblCPUTemp.Text = $"{(int)data.CpuTemp} °C";
-            lblCPUFan.Text = $"{(int)data.CpuFan} %";
-            lblGPUTemp.Text = $"{(int)data.GpuTemp} °C";
-            lblGPUFan.Text = $"{(int)data.GpuFan} %";
-            lblFps.Text = $"{(int)data.Fps}";
+            lblCPUTemp.Text = $"{data.CpuTemp:0.00} °C";
+            lblCPUFan.Text = $"{data.CpuFan:0.00} %";
+            lblGPUTemp.Text = $"{data.GpuTemp:0.00} °C";
+            lblGPUFan.Text = $"{data.GpuFan:0.00} %";
+            lblFps.Text = $"{data.Fps}";
         }
 
         private void AddLog(string line)

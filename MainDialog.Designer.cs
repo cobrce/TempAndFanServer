@@ -61,12 +61,30 @@ namespace TempAndFanServer {
         
         private Terminal.Gui.Label label8;
         
+        private Terminal.Gui.Window windowSensors;
+        
+        private Terminal.Gui.FrameView frameView;
+        
+        private Terminal.Gui.TreeView treeSensors;
+        
+        private Terminal.Gui.Label label6;
+        
+        private Terminal.Gui.Label lblSensorValue;
+        
+        private Terminal.Gui.Button button;
+        
         private Terminal.Gui.StatusBar statusBar;
         
         private Terminal.Gui.StatusItem ctrlQToQuit;
         
         private void InitializeComponent() {
             this.statusBar = new Terminal.Gui.StatusBar();
+            this.button = new Terminal.Gui.Button();
+            this.lblSensorValue = new Terminal.Gui.Label();
+            this.label6 = new Terminal.Gui.Label();
+            this.treeSensors = new Terminal.Gui.TreeView();
+            this.frameView = new Terminal.Gui.FrameView();
+            this.windowSensors = new Terminal.Gui.Window();
             this.label8 = new Terminal.Gui.Label();
             this.label7 = new Terminal.Gui.Label();
             this.windowAbout = new Terminal.Gui.Window();
@@ -342,6 +360,77 @@ namespace TempAndFanServer {
             this.label8.Text = "By Cob_258 (github.com/cobrce)";
             this.label8.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.windowAbout.Add(this.label8);
+            this.windowSensors.Width = 88;
+            this.windowSensors.Height = 19;
+            this.windowSensors.X = 23;
+            this.windowSensors.Y = 21;
+            this.windowSensors.Visible = true;
+            this.windowSensors.ColorScheme = this.greyOnBlack;
+            this.windowSensors.Modal = false;
+            this.windowSensors.IsMdiContainer = false;
+            this.windowSensors.Data = "windowSensors";
+            this.windowSensors.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.windowSensors.Border.Effect3D = true;
+            this.windowSensors.Border.Effect3DBrush = null;
+            this.windowSensors.Border.DrawMarginFrame = true;
+            this.windowSensors.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.windowSensors.Title = "Select sensor";
+            this.Add(this.windowSensors);
+            this.frameView.Width = 86;
+            this.frameView.Height = 16;
+            this.frameView.X = 0;
+            this.frameView.Y = 0;
+            this.frameView.Visible = true;
+            this.frameView.Data = "frameView";
+            this.frameView.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.frameView.Border.Effect3D = false;
+            this.frameView.Border.Effect3DBrush = null;
+            this.frameView.Border.DrawMarginFrame = true;
+            this.frameView.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.frameView.Title = "";
+            this.windowSensors.Add(this.frameView);
+            this.treeSensors.Width = 85;
+            this.treeSensors.Height = 15;
+            this.treeSensors.X = 0;
+            this.treeSensors.Y = 0;
+            this.treeSensors.Visible = true;
+            this.treeSensors.Data = "treeSensors";
+            this.treeSensors.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.treeSensors.Style.CollapseableSymbol = '-';
+            this.treeSensors.Style.ColorExpandSymbol = false;
+            this.treeSensors.Style.ExpandableSymbol = '+';
+            this.treeSensors.Style.InvertExpandSymbolColors = false;
+            this.treeSensors.Style.LeaveLastRow = false;
+            this.treeSensors.Style.ShowBranchLines = true;
+            this.frameView.Add(this.treeSensors);
+            this.label6.Width = 14;
+            this.label6.Height = 1;
+            this.label6.X = 1;
+            this.label6.Y = 16;
+            this.label6.Visible = true;
+            this.label6.Data = "label6";
+            this.label6.Text = "Actual value : ";
+            this.label6.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.windowSensors.Add(this.label6);
+            this.lblSensorValue.Width = 3;
+            this.lblSensorValue.Height = 1;
+            this.lblSensorValue.X = 16;
+            this.lblSensorValue.Y = 16;
+            this.lblSensorValue.Visible = true;
+            this.lblSensorValue.Data = "lblSensorValue";
+            this.lblSensorValue.Text = "";
+            this.lblSensorValue.TextAlignment = Terminal.Gui.TextAlignment.Right;
+            this.windowSensors.Add(this.lblSensorValue);
+            this.button.Width = 8;
+            this.button.Height = 1;
+            this.button.X = 75;
+            this.button.Y = 16;
+            this.button.Visible = true;
+            this.button.Data = "button";
+            this.button.Text = "Cancel";
+            this.button.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.button.IsDefault = false;
+            this.windowSensors.Add(this.button);
             this.statusBar.Width = Dim.Fill(0);
             this.statusBar.Height = 1;
             this.statusBar.X = 0;
