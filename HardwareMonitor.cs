@@ -33,7 +33,9 @@ namespace TempAndFanServer
                 new SensorDescrpitor("SuperIO", "Control", "Fan #2"),
                 new SensorDescrpitor("GpuNvidia", "Control", "GPU Fan 1")
                 );
-            private string? FileName;
+
+
+            public string? FileName { get; set; }
 
             public static bool LoadFromFile(string fileName, out HardwareDescriptor hardwareDescriptor)
             {

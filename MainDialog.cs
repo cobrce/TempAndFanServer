@@ -208,14 +208,14 @@ namespace TempAndFanServer
         const string hwdescFileName = "hwdesc.json";
         private HardwareMonitor.HardwareDescriptor ReadHwDescriptor()
         {
+            string hwdescFileNameFullPath = Path.Combine(
+                Path.GetDirectoryName(typeof(MainDialog).Assembly.Location),
+                hwdescFileName
+                );
             try
             {
-                string hwdescFileNameFullPath = Path.Combine(
-                    Path.GetDirectoryName(typeof(MainDialog).Assembly.Location),
-                    hwdescFileName
-                    );
-                 if (HardwareMonitor.HardwareDescriptor.LoadFromFile(hwdescFileNameFullPath,  out HardwareMonitor.HardwareDescriptor hardwareDescriptor))
-                 {
+                if (HardwareMonitor.HardwareDescriptor.LoadFromFile(hwdescFileNameFullPath, out HardwareMonitor.HardwareDescriptor hardwareDescriptor))
+                {
                     return hardwareDescriptor;
                  }
                 else
@@ -227,7 +227,7 @@ namespace TempAndFanServer
             {
                 AddLog($"Exception happend when reading descriptor {hwdescFileName}, using default one");
             }
-            return HardwareMonitor.HardwareDescriptor.Default;
+            return HardwareMonitor.HardwareDescriptor.Default with { FileName = hwdescFileNameFullPath };
         }
 
 
