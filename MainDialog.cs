@@ -375,7 +375,7 @@ namespace TempAndFanServer
             lblCPUFan.Text = $"{data.CpuFan:0.00} %";
             lblGPUTemp.Text = $"{data.GpuTemp:0.00} °C";
             lblGPUFan.Text = $"{data.GpuFan:0.00} %";
-            lblFps.Text = $"{data.Fps}";
+            lblFps.Text = $"{data.Fps:0.0}";
         }
 
         private void AddLog(string line)

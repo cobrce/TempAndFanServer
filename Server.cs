@@ -18,7 +18,7 @@ namespace TempAndFanServer
                 Buffer.BlockCopy(BitConverter.GetBytes(GpuTemp / 100.0f), 0, bytes, 4, 4);
                 Buffer.BlockCopy(BitConverter.GetBytes(CpuFan / 100.0f), 0, bytes, 8, 4);
                 Buffer.BlockCopy(BitConverter.GetBytes(GpuFan / 100.0f), 0, bytes, 12, 4);
-                Buffer.BlockCopy(BitConverter.GetBytes(Fps / 100.0f), 0, bytes, 16, 4);
+                Buffer.BlockCopy(BitConverter.GetBytes(Fps), 0, bytes, 16, 4);
 
                 return bytes;
             }

@@ -78,10 +78,12 @@ namespace TempAndFanServer
         }
 
 
+        private readonly RTSS? rtss;
         private readonly Computer computer = new() { IsCpuEnabled = true, IsGpuEnabled = true, IsMotherboardEnabled = true };
         public HardwareMonitor(HardwareDescriptor hardwareDescriptor)
         {
             hwDescriptor = hardwareDescriptor;
+            RTSS.Initialize(out rtss);
             computer.Open(false);
             _ = Task.Run(GetStatsAsync);
         }
@@ -111,7 +113,7 @@ namespace TempAndFanServer
 
         private float GetFps()
         {
-            return 0.0f;
+            return rtss?.GetFPS() ?? 0.0f;
         }
 
         private float GetGpuFan() => ReadHardwareSensor(hwDescriptor.GpuFanDescriptor);
