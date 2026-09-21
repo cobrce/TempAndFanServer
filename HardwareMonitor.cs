@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.VisualBasic;
 using OpenHardwareMonitor.Hardware;
 
@@ -34,7 +35,7 @@ namespace TempAndFanServer
                 new SensorDescrpitor("GpuNvidia", "Control", "GPU Fan 1")
                 );
 
-
+            [JsonIgnore]
             public string? FileName { get; set; }
 
             public static bool LoadFromFile(string fileName, out HardwareDescriptor hardwareDescriptor)
