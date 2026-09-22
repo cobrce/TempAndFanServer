@@ -47,13 +47,58 @@ namespace TempAndFanServer
 
             btnWindowSensorCancel.Clicked += (() => { treeSensors.SelectedObject = null; ShowSensorWindow(false); });
             btnWindowSensorSelect.Clicked += (() => { if (treeSensors.SelectedObject != null) ShowSensorWindow(false); });
-            lblCPUTemp.Clicked += SelectCPUTempSensor;
-            lblCPUFan.Clicked += SelectCPUFanSensor;
-            lblGPUTemp.Clicked += SelectGPUTempSensor;
-            lblGPUFan.Clicked += SelectGpuFanSensor;
-        }
-        
 
+
+            lblCPUTemp.Clicked += (() => SensorLabelClicked(lblCPUTemp));
+            lblCPUFan.Clicked += (() => SensorLabelClicked(lblCPUFan));
+            lblGPUTemp.Clicked += (() => SensorLabelClicked(lblGPUTemp));
+            lblGPUFan.Clicked += (() => SensorLabelClicked(lblGPUFan));
+            windowSensors.VisibleChanged += WindowSensorHide;
+
+            lblCPUTemp.Data = ((HardwareMonitor.SensorDescrpitor descriptor) =>
+            {
+                if (descriptor != null)
+                    hardwareMonitor.CpuTempDescriptor = descriptor;
+                return hardwareMonitor.CpuTempDescriptor;
+            });
+            lblGPUTemp.Data = ((HardwareMonitor.SensorDescrpitor descriptor) =>
+            {
+                if (descriptor != null)
+                    hardwareMonitor.GpuTempDescriptor = descriptor;
+                return hardwareMonitor.GpuTempDescriptor;
+            });
+            lblCPUFan.Data = ((HardwareMonitor.SensorDescrpitor descriptor) =>
+            {
+                if (descriptor != null)
+                    hardwareMonitor.CpuFanDescriptor = descriptor;
+                return hardwareMonitor.CpuFanDescriptor;
+            });
+            lblGPUFan.Data = ((HardwareMonitor.SensorDescrpitor descriptor) =>
+            {
+                if (descriptor != null)
+                    hardwareMonitor.GpuFanDescriptor = descriptor;
+                return hardwareMonitor.GpuFanDescriptor;
+            });
+        }
+
+        private void WindowSensorHide()
+        {
+            if (windowSensors.Visible || treeSensors.SelectedObject == null)
+                return;
+            if (treeSensors.Data is Label l)
+            {
+                var updater = (l.Data as Func<HardwareMonitor.SensorDescrpitor, HardwareMonitor.SensorDescrpitor>);
+                updater(HardwareMonitor.SensorDescrpitor.FromSensor((ISensor)treeSensors.SelectedObject.Tag));
+                treeSensors.Data = null;
+            }
+        }
+
+        void SensorLabelClicked(Label label)
+        {
+            treeSensors.Data = label;
+            SelectSensorInTreeView((label.Data as Func<HardwareMonitor.SensorDescrpitor, HardwareMonitor.SensorDescrpitor>).Invoke(null));
+            ShowSensorWindow(true);
+        }
         private void SelectSensorInTreeView(HardwareMonitor.SensorDescrpitor descrpitor)
         {
             List<ITreeNode> nodes = new();
@@ -74,70 +119,6 @@ namespace TempAndFanServer
                 }
             }
 
-        }
-
-
-        // CPU temperature sensor
-        private void SelectCPUTempSensor()
-        {
-            SelectSensorInTreeView(hardwareMonitor.CpuTempDescriptor);
-            ShowSensorWindow(true);
-            windowSensors.VisibleChanged+= SelectCPUTempSensorEnd;
-        }
-
-        private void SelectCPUTempSensorEnd()
-        {
-            windowSensors.VisibleChanged-= SelectCPUTempSensorEnd;
-            if (treeSensors.SelectedObject!=null)
-                hardwareMonitor.CpuTempDescriptor = HardwareMonitor.SensorDescrpitor.FromSensor((ISensor)treeSensors.SelectedObject.Tag);
-        }
-
-        // CPU fan sensor
-
-        private void SelectCPUFanSensor()
-        {
-            SelectSensorInTreeView(hardwareMonitor.CpuFanDescriptor);
-            ShowSensorWindow(true);
-            windowSensors.VisibleChanged+= SelectCPUFanSensorEnd;
-        }
-
-
-        private void SelectCPUFanSensorEnd()
-        {
-            windowSensors.VisibleChanged-= SelectCPUFanSensorEnd;
-            if (treeSensors.SelectedObject!=null)
-                hardwareMonitor.CpuFanDescriptor = HardwareMonitor.SensorDescrpitor.FromSensor((ISensor)treeSensors.SelectedObject.Tag);
-        }
-
-        // GPU temperature sensor
-        private void SelectGPUTempSensor()
-        {
-            SelectSensorInTreeView(hardwareMonitor.GpuTempDescriptor);
-            ShowSensorWindow(true);
-            windowSensors.VisibleChanged+= SelectGPUTempSensorEnd;
-        }
-
-        private void SelectGPUTempSensorEnd()
-        {
-            windowSensors.VisibleChanged-= SelectGPUTempSensorEnd;
-            if (treeSensors.SelectedObject!=null)
-                hardwareMonitor.GpuTempDescriptor = HardwareMonitor.SensorDescrpitor.FromSensor((ISensor)treeSensors.SelectedObject.Tag);
-        }
-
-        // GPU fan sensor
-        private void SelectGpuFanSensor()
-        {
-            SelectSensorInTreeView(hardwareMonitor.GpuFanDescriptor);
-            ShowSensorWindow(true);
-            windowSensors.VisibleChanged+= SelectGpuFanSensorEnd;
-        }
-
-        private void SelectGpuFanSensorEnd()
-        {
-            windowSensors.VisibleChanged-=SelectGpuFanSensorEnd;
-            if (treeSensors.SelectedObject!=null)
-                hardwareMonitor.GpuFanDescriptor = HardwareMonitor.SensorDescrpitor.FromSensor((ISensor)treeSensors.SelectedObject.Tag);
-            ShowSensorWindow(false);
         }
 
         void ShowSensorWindow(bool visible)

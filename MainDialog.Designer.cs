@@ -19,6 +19,10 @@ namespace TempAndFanServer {
         
         private Terminal.Gui.ColorScheme blueOnBlack;
         
+        private Terminal.Gui.ColorScheme redOnBlack;
+        
+        private Terminal.Gui.ColorScheme greenOnBlack;
+        
         private Terminal.Gui.Window windowStats;
         
         private Terminal.Gui.FrameView frameViewCPU;
@@ -123,6 +127,18 @@ namespace TempAndFanServer {
             this.blueOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.BrightYellow);
             this.blueOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.BrightYellow);
             this.blueOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Black);
+            this.redOnBlack = new Terminal.Gui.ColorScheme();
+            this.redOnBlack.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Red, Terminal.Gui.Color.Black);
+            this.redOnBlack.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightRed, Terminal.Gui.Color.Black);
+            this.redOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Red, Terminal.Gui.Color.Brown);
+            this.redOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightRed, Terminal.Gui.Color.Brown);
+            this.redOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Black);
+            this.greenOnBlack = new Terminal.Gui.ColorScheme();
+            this.greenOnBlack.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Green, Terminal.Gui.Color.Black);
+            this.greenOnBlack.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightGreen, Terminal.Gui.Color.Black);
+            this.greenOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Green, Terminal.Gui.Color.Magenta);
+            this.greenOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightGreen, Terminal.Gui.Color.Magenta);
+            this.greenOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Black);
             this.Width = Dim.Fill(0);
             this.Height = Dim.Fill(0);
             this.X = 0;
@@ -370,12 +386,12 @@ namespace TempAndFanServer {
             this.windowSensors.X = 23;
             this.windowSensors.Y = 21;
             this.windowSensors.Visible = true;
-            this.windowSensors.ColorScheme = this.greyOnBlack;
+            this.windowSensors.ColorScheme = this.greenOnBlack;
             this.windowSensors.Modal = false;
             this.windowSensors.IsMdiContainer = false;
             this.windowSensors.Data = "windowSensors";
-            this.windowSensors.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.windowSensors.Border.Effect3D = true;
+            this.windowSensors.Border.BorderStyle = Terminal.Gui.BorderStyle.Rounded;
+            this.windowSensors.Border.Effect3D = false;
             this.windowSensors.Border.Effect3DBrush = null;
             this.windowSensors.Border.DrawMarginFrame = true;
             this.windowSensors.TextAlignment = Terminal.Gui.TextAlignment.Left;
