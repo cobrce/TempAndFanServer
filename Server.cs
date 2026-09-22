@@ -79,8 +79,8 @@ namespace TempAndFanServer
                     await stream.FlushAsync(token);
                     byte[] acknowledge = new byte[1];
                     if (0 == await stream.ReadAsync(acknowledge.AsMemory(0, 1), token))
-                        break;
-                    
+                        throw new Exception();
+
                     errorCounter = 0;
                 }
                 catch
