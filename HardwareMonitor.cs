@@ -40,14 +40,14 @@ namespace TempAndFanServer
 
             public static bool LoadFromFile(string fileName, out HardwareDescriptor hardwareDescriptor)
             {
-                hardwareDescriptor =  Default;
+                hardwareDescriptor = Default;
                 if (!File.Exists(fileName))
                     return false;
 
 
                 using var stream = new FileStream(fileName, FileMode.Open);
                 HardwareDescriptor? result = JsonSerializer.Deserialize<HardwareDescriptor>(stream);
-                if (result!=null)
+                if (result != null)
                 {
                     hardwareDescriptor = result;
                     hardwareDescriptor.FileName = fileName;
@@ -88,12 +88,14 @@ namespace TempAndFanServer
             _ = Task.Run(GetStatsAsync);
         }
 
+        public event Action<string, SensorDescrpitor> DescriptorChanged;
+
         private Server.Data cachedData = new(0, 0, 0, 0, 0);
         private HardwareDescriptor hwDescriptor;
-        public SensorDescrpitor CpuTempDescriptor { get => hwDescriptor.CpuTempDescriptor; set { hwDescriptor = hwDescriptor with { CpuTempDescriptor = value }; hwDescriptor.SaveToFile(); } }
-        public SensorDescrpitor GpuTempDescriptor { get => hwDescriptor.GpuTempDescriptor; set { hwDescriptor = hwDescriptor with { GpuTempDescriptor = value }; hwDescriptor.SaveToFile(); } }
-        public SensorDescrpitor CpuFanDescriptor { get => hwDescriptor.CpuFanDescriptor; set { hwDescriptor = hwDescriptor with { CpuFanDescriptor = value }; hwDescriptor.SaveToFile(); } }
-        public SensorDescrpitor GpuFanDescriptor { get => hwDescriptor.GpuFanDescriptor; set { hwDescriptor = hwDescriptor with { GpuFanDescriptor = value }; hwDescriptor.SaveToFile(); } }
+        public SensorDescrpitor CpuTempDescriptor { get => hwDescriptor.CpuTempDescriptor; set { hwDescriptor = hwDescriptor with { CpuTempDescriptor = value }; DescriptorChanged?.Invoke("CPU temp", value); hwDescriptor.SaveToFile(); } }
+        public SensorDescrpitor GpuTempDescriptor { get => hwDescriptor.GpuTempDescriptor; set { hwDescriptor = hwDescriptor with { GpuTempDescriptor = value }; DescriptorChanged?.Invoke("GPU temp", value); hwDescriptor.SaveToFile(); } }
+        public SensorDescrpitor CpuFanDescriptor { get => hwDescriptor.CpuFanDescriptor; set { hwDescriptor = hwDescriptor with { CpuFanDescriptor = value }; DescriptorChanged?.Invoke("CPU fan", value); hwDescriptor.SaveToFile(); } }
+        public SensorDescrpitor GpuFanDescriptor { get => hwDescriptor.GpuFanDescriptor; set { hwDescriptor = hwDescriptor with { GpuFanDescriptor = value }; DescriptorChanged?.Invoke("GPU fan", value); hwDescriptor.SaveToFile(); } }
 
         private async void GetStatsAsync()
         {
@@ -120,7 +122,7 @@ namespace TempAndFanServer
         private float GetCpuFan() => ReadHardwareSensor(hwDescriptor.CpuFanDescriptor);
         private float GetGpuTemp() => ReadHardwareSensor(hwDescriptor.GpuTempDescriptor);
         private float GetCpuTemp() => ReadHardwareSensor(hwDescriptor.CpuTempDescriptor);
-        
+
 
         private ISensor? SelectSensor(IEnumerable<ISensor> sensors, SensorDescrpitor sensorDescrpitor)
         {
@@ -164,17 +166,17 @@ namespace TempAndFanServer
             foreach (var hardware in computer.Hardware)
             {
                 hardware.Update();
-                foreach(var subhardware in hardware.SubHardware)
+                foreach (var subhardware in hardware.SubHardware)
                 {
-                    subhardware.Update(); 
+                    subhardware.Update();
                 }
 
             }
             return computer.Hardware;
         }
 
-        private readonly Dictionary<SensorDescrpitor,ISensor> sensorsDictionary = [];
-        private float ReadHardwareSensor(SensorDescrpitor sensorDescrpitor,bool cached = true)
+        private readonly Dictionary<SensorDescrpitor, ISensor> sensorsDictionary = [];
+        private float ReadHardwareSensor(SensorDescrpitor sensorDescrpitor, bool cached = true)
         {
             if (cached && sensorsDictionary.TryGetValue(sensorDescrpitor, out ISensor? sensor) && sensor != null)
             {
@@ -183,7 +185,7 @@ namespace TempAndFanServer
             }
 
             sensor = SelectSensor(sensorDescrpitor);
-            if(sensor!=null)
+            if (sensor != null)
                 sensorsDictionary[sensorDescrpitor] = sensor;
             return (float)((sensor?.Value) ?? 0.0);
         }

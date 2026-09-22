@@ -32,6 +32,13 @@ namespace TempAndFanServer
             HookWindow(windowAbout);
 
             hardwareMonitor = new HardwareMonitor(ReadHwDescriptor());
+            hardwareMonitor.DescriptorChanged+= LogSelectedSensor;
+
+            AddLog("Hardware descriptors:");
+            LogSelectedSensor("CPU temp:",hardwareMonitor.CpuTempDescriptor);
+            LogSelectedSensor("GPU temp:",hardwareMonitor.GpuTempDescriptor);
+            LogSelectedSensor("CPU fan:",hardwareMonitor.CpuFanDescriptor);
+            LogSelectedSensor("GPU fan:",hardwareMonitor.GpuFanDescriptor);
 
             server = new Server();
             server.OnLog += AddLog;
@@ -79,6 +86,12 @@ namespace TempAndFanServer
                     hardwareMonitor.GpuFanDescriptor = descriptor;
                 return hardwareMonitor.GpuFanDescriptor;
             });
+        }
+
+        private void LogSelectedSensor(string title, HardwareMonitor.SensorDescrpitor descriptor)
+        {
+            AddLog("  " + title);
+            AddLog($"    [{descriptor.HardwareType}|{descriptor.SensorType}|{descriptor.SensorName}]");
         }
 
         private void WindowSensorHide()
@@ -212,20 +225,27 @@ namespace TempAndFanServer
         }
 
 
-        private ScrollBarView CreateScrollBar(View view)
+        private ScrollBarView CreateScrollBar(ListView view)
         {
-            ScrollBarView scrollBar = new ScrollBarView(logView, true, true);
+            ScrollBarView scrollBar = new ScrollBarView(view, true, true);
             view.Add(scrollBar);
-            scrollBar.ChangedPosition += () =>
-            {
-                view.SetNeedsDisplay();
-            };
 
             view.DrawContent += (e) =>
             {
-                scrollBar.Size = logView.Source.Count - 1;
-                scrollBar.Position = logView.TopItem;
+                scrollBar.Size = view.Source.Count;
+                scrollBar.Position = view.TopItem;
                 scrollBar.Refresh();
+            };
+
+
+            scrollBar.MouseClick += (e) =>
+            {
+                chkScroll.Checked = false;
+            };
+            scrollBar.ChangedPosition += () =>
+            {
+                view.TopItem = scrollBar.Position;
+                view.SetNeedsDisplay();
             };
             return scrollBar;
         }
@@ -237,23 +257,19 @@ namespace TempAndFanServer
 
             var scrollBar = CreateScrollBar(logView);
 
-            scrollBar.MouseClick += (e) =>
-            {
-                chkScroll.Checked = false;
-            };
-
             logView.MouseClick += (e) =>
             {
                 chkScroll.Checked = false;
             };
 
-            scrollBar.ChangedPosition += () =>
-            {
-                logView.TopItem = scrollBar.Position;
-                logView.SetNeedsDisplay();
-            };
+            chkScroll.Toggled += chkScrollToggled;
         }
 
+        private void chkScrollToggled(bool prevState)
+        {
+            if (!prevState)
+                logView.TopItem = Math.Max(0, LogList.Count - 1);
+        }
 
         public bool StartServer(MainLoop loop)
         {
@@ -362,7 +378,7 @@ namespace TempAndFanServer
         private void AddLog(string line)
         {
             LogList.Add(line);
-            if (chkScroll.Checked)
+           if (chkScroll.Checked)
                 logView.TopItem = Math.Max(0, LogList.Count - 1);
         }
     }
