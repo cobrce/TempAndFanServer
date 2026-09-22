@@ -49,12 +49,12 @@ namespace TempAndFanServer
 
             PopulateSensorsTree();
             treeSensors.SelectionChanged+= SensorSelected;
+            treeSensors.ObjectActivated += ((args) => ShowSensorWindow(false));
             windowSensors.Visible = false;
             windowSensors.Modal = true;
 
             btnWindowSensorCancel.Clicked += (() => { treeSensors.SelectedObject = null; ShowSensorWindow(false); });
             btnWindowSensorSelect.Clicked += (() => { if (treeSensors.SelectedObject != null) ShowSensorWindow(false); });
-
 
             lblCPUTemp.Clicked += (() => SensorLabelClicked(lblCPUTemp));
             lblCPUFan.Clicked += (() => SensorLabelClicked(lblCPUFan));
@@ -87,7 +87,6 @@ namespace TempAndFanServer
                 return hardwareMonitor.GpuFanDescriptor;
             });
         }
-
         private void LogSelectedSensor(string title, HardwareMonitor.SensorDescrpitor descriptor)
         {
             AddLog("  " + title);

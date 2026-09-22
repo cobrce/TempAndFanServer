@@ -88,7 +88,7 @@ namespace TempAndFanServer
             _ = Task.Run(GetStatsAsync);
         }
 
-        public event Action<string, SensorDescrpitor> DescriptorChanged;
+        public event Action<string, SensorDescrpitor>? DescriptorChanged;
 
         private Server.Data cachedData = new(0, 0, 0, 0, 0);
         private HardwareDescriptor hwDescriptor;
