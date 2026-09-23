@@ -23,6 +23,8 @@ namespace TempAndFanServer {
         
         private Terminal.Gui.ColorScheme greenOnBlack;
         
+        private Terminal.Gui.ColorScheme tgDefault;
+        
         private Terminal.Gui.Window windowStats;
         
         private Terminal.Gui.FrameView frameViewCPU;
@@ -79,14 +81,37 @@ namespace TempAndFanServer {
         
         private Terminal.Gui.Button btnWindowSensorCancel;
         
+        private Terminal.Gui.FrameView frameDashboard;
+        
+        private Terminal.Gui.FrameView frameView2;
+        
+        private Terminal.Gui.TextView txtCpuFan;
+        
+        private Terminal.Gui.TextView txtCPUTemp;
+        
+        private Terminal.Gui.FrameView frameView3;
+        
+        private Terminal.Gui.TextView txtGpuFan;
+        
+        private Terminal.Gui.TextView txtGPUTemp;
+        
         private Terminal.Gui.StatusBar statusBar;
         
         private Terminal.Gui.StatusItem ctrlQToQuit;
         
         private Terminal.Gui.StatusItem clickOnAStatToSelectItsSensor;
         
+        private Terminal.Gui.StatusItem altDToToggleBetweenDashboardAndFullMode;
+        
         private void InitializeComponent() {
             this.statusBar = new Terminal.Gui.StatusBar();
+            this.txtGPUTemp = new Terminal.Gui.TextView();
+            this.txtGpuFan = new Terminal.Gui.TextView();
+            this.frameView3 = new Terminal.Gui.FrameView();
+            this.txtCPUTemp = new Terminal.Gui.TextView();
+            this.txtCpuFan = new Terminal.Gui.TextView();
+            this.frameView2 = new Terminal.Gui.FrameView();
+            this.frameDashboard = new Terminal.Gui.FrameView();
             this.btnWindowSensorCancel = new Terminal.Gui.Button();
             this.btnWindowSensorSelect = new Terminal.Gui.Button();
             this.lblSensorValue = new Terminal.Gui.Label();
@@ -139,6 +164,12 @@ namespace TempAndFanServer {
             this.greenOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Green, Terminal.Gui.Color.Magenta);
             this.greenOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightGreen, Terminal.Gui.Color.Magenta);
             this.greenOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Black);
+            this.tgDefault = new Terminal.Gui.ColorScheme();
+            this.tgDefault.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
+            this.tgDefault.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.Blue);
+            this.tgDefault.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
+            this.tgDefault.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Gray);
+            this.tgDefault.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Brown, Terminal.Gui.Color.Blue);
             this.Width = Dim.Fill(0);
             this.Height = Dim.Fill(0);
             this.X = 0;
@@ -350,7 +381,7 @@ namespace TempAndFanServer {
             this.windowAbout.Width = 37;
             this.windowAbout.Height = 4;
             this.windowAbout.X = 11;
-            this.windowAbout.Y = 14;
+            this.windowAbout.Y = 13;
             this.windowAbout.Visible = true;
             this.windowAbout.ColorScheme = this.blueOnBlack;
             this.windowAbout.Modal = false;
@@ -383,8 +414,8 @@ namespace TempAndFanServer {
             this.windowAbout.Add(this.label8);
             this.windowSensors.Width = 88;
             this.windowSensors.Height = 19;
-            this.windowSensors.X = 23;
-            this.windowSensors.Y = 21;
+            this.windowSensors.X = 3;
+            this.windowSensors.Y = 22;
             this.windowSensors.Visible = true;
             this.windowSensors.ColorScheme = this.greenOnBlack;
             this.windowSensors.Modal = false;
@@ -462,6 +493,96 @@ namespace TempAndFanServer {
             this.btnWindowSensorCancel.TextAlignment = Terminal.Gui.TextAlignment.Centered;
             this.btnWindowSensorCancel.IsDefault = false;
             this.windowSensors.Add(this.btnWindowSensorCancel);
+            this.frameDashboard.Width = 67;
+            this.frameDashboard.Height = 19;
+            this.frameDashboard.X = 93;
+            this.frameDashboard.Y = 22;
+            this.frameDashboard.Visible = true;
+            this.frameDashboard.Data = "frameDashboard";
+            this.frameDashboard.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.frameDashboard.Border.Effect3D = false;
+            this.frameDashboard.Border.Effect3DBrush = null;
+            this.frameDashboard.Border.DrawMarginFrame = true;
+            this.frameDashboard.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.frameDashboard.Title = "";
+            this.Add(this.frameDashboard);
+            this.frameView2.Width = 6;
+            this.frameView2.Height = 7;
+            this.frameView2.X = 1;
+            this.frameView2.Y = 1;
+            this.frameView2.Visible = true;
+            this.frameView2.Data = "frameView2";
+            this.frameView2.Border.BorderStyle = Terminal.Gui.BorderStyle.Rounded;
+            this.frameView2.Border.Effect3D = false;
+            this.frameView2.Border.Effect3DBrush = null;
+            this.frameView2.Border.DrawMarginFrame = true;
+            this.frameView2.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.frameView2.Title = "Heya";
+            this.frameDashboard.Add(this.frameView2);
+            this.txtCpuFan.Width = 4;
+            this.txtCpuFan.Height = 5;
+            this.txtCpuFan.X = 0;
+            this.txtCpuFan.Y = 0;
+            this.txtCpuFan.Visible = true;
+            this.txtCpuFan.AllowsTab = true;
+            this.txtCpuFan.AllowsReturn = true;
+            this.txtCpuFan.WordWrap = false;
+            this.txtCpuFan.Data = "txtCpuFan";
+            this.txtCpuFan.Text = "";
+            this.txtCpuFan.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.frameView2.Add(this.txtCpuFan);
+            this.txtCPUTemp.Width = 53;
+            this.txtCPUTemp.Height = 7;
+            this.txtCPUTemp.X = 8;
+            this.txtCPUTemp.Y = 1;
+            this.txtCPUTemp.Visible = true;
+            this.txtCPUTemp.ColorScheme = this.blueOnBlack;
+            this.txtCPUTemp.AllowsTab = true;
+            this.txtCPUTemp.AllowsReturn = true;
+            this.txtCPUTemp.WordWrap = false;
+            this.txtCPUTemp.Data = "txtCPUTemp";
+            this.txtCPUTemp.Text = "";
+            this.txtCPUTemp.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.frameDashboard.Add(this.txtCPUTemp);
+            this.frameView3.Width = 6;
+            this.frameView3.Height = 7;
+            this.frameView3.X = 1;
+            this.frameView3.Y = 9;
+            this.frameView3.Visible = true;
+            this.frameView3.Data = "frameView3";
+            this.frameView3.Border.BorderStyle = Terminal.Gui.BorderStyle.Rounded;
+            this.frameView3.Border.Effect3D = false;
+            this.frameView3.Border.Effect3DBrush = null;
+            this.frameView3.Border.DrawMarginFrame = true;
+            this.frameView3.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.frameView3.Title = "";
+            this.frameDashboard.Add(this.frameView3);
+            this.txtGpuFan.Width = 4;
+            this.txtGpuFan.Height = 5;
+            this.txtGpuFan.X = 0;
+            this.txtGpuFan.Y = 0;
+            this.txtGpuFan.Visible = true;
+            this.txtGpuFan.ColorScheme = this.greenOnBlack;
+            this.txtGpuFan.AllowsTab = true;
+            this.txtGpuFan.AllowsReturn = true;
+            this.txtGpuFan.WordWrap = false;
+            this.txtGpuFan.Data = "txtGpuFan";
+            this.txtGpuFan.Text = "";
+            this.txtGpuFan.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.frameView3.Add(this.txtGpuFan);
+            this.txtGPUTemp.Width = 53;
+            this.txtGPUTemp.Height = 7;
+            this.txtGPUTemp.X = 8;
+            this.txtGPUTemp.Y = 9;
+            this.txtGPUTemp.Visible = true;
+            this.txtGPUTemp.ColorScheme = this.greenOnBlack;
+            this.txtGPUTemp.AllowsTab = true;
+            this.txtGPUTemp.AllowsReturn = true;
+            this.txtGPUTemp.WordWrap = false;
+            this.txtGPUTemp.Data = "txtGPUTemp";
+            this.txtGPUTemp.Text = "";
+            this.txtGPUTemp.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.frameDashboard.Add(this.txtGPUTemp);
             this.statusBar.Width = Dim.Fill(0);
             this.statusBar.Height = 1;
             this.statusBar.X = 0;
@@ -472,9 +593,11 @@ namespace TempAndFanServer {
             this.statusBar.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.ctrlQToQuit = new Terminal.Gui.StatusItem(((Terminal.Gui.Key)(1048588u)), "Ctrl+Q to quit", null);
             this.clickOnAStatToSelectItsSensor = new Terminal.Gui.StatusItem(((Terminal.Gui.Key)(0u)), "Click on a stat to select its sensor", null);
+            this.altDToToggleBetweenDashboardAndFullMode = new Terminal.Gui.StatusItem(((Terminal.Gui.Key)(2147483716u)), "Alt+D to toggle between dashboard and full mode", null);
             this.statusBar.Items = new Terminal.Gui.StatusItem[] {
                     this.ctrlQToQuit,
-                    this.clickOnAStatToSelectItsSensor};
+                    this.clickOnAStatToSelectItsSensor,
+                    this.altDToToggleBetweenDashboardAndFullMode};
             this.Add(this.statusBar);
         }
     }

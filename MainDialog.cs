@@ -61,6 +61,16 @@ namespace TempAndFanServer
             lblGPUTemp.Clicked += (() => SensorLabelClicked(lblGPUTemp));
             lblGPUFan.Clicked += (() => SensorLabelClicked(lblGPUFan));
             windowSensors.VisibleChanged += WindowSensorHide;
+            txtCPUTemp.Enabled = false;
+            txtGPUTemp.Enabled = false;
+            txtCpuFan.Enabled = false;
+            txtGpuFan.Enabled = false;
+
+            greenOnBlack.Disabled = greenOnBlack.Normal;
+            blueOnBlack.Disabled = blueOnBlack.Normal;
+            frameDashboard.Border.BorderStyle = BorderStyle.None;
+            altDToToggleBetweenDashboardAndFullMode.Action += (() => ShowDashboard(!frameDashboard.Visible));
+
 
             lblCPUTemp.Data = ((HardwareMonitor.SensorDescrpitor descriptor) =>
             {
@@ -86,6 +96,28 @@ namespace TempAndFanServer
                     hardwareMonitor.GpuFanDescriptor = descriptor;
                 return hardwareMonitor.GpuFanDescriptor;
             });
+            
+            fullViewWindows.Add(windowAbout);
+            fullViewWindows.Add(windowSensors);
+            fullViewWindows.Add(windowLog);
+            fullViewWindows.Add(windowStats);
+            ShowDashboard(false);
+        }
+        List<Window> fullViewWindows = new List<Window>();
+
+        private void ShowDashboard(bool visible = false)
+        {
+            treeSensors.SelectedObject = null;
+            foreach (var window in fullViewWindows)
+            {
+                if (!visible && window == windowSensors)
+                    continue;
+                window.Visible = !visible;
+            }
+            
+            frameDashboard.Visible = visible;
+            frameDashboard.X = Pos.Center();
+            frameDashboard.Y = Pos.Center();            
         }
         private void LogSelectedSensor(string title, HardwareMonitor.SensorDescrpitor descriptor)
         {
@@ -372,6 +404,17 @@ namespace TempAndFanServer
             lblGPUTemp.Text = $"{data.GpuTemp:0.00} °C";
             lblGPUFan.Text = $"{data.GpuFan:0.00} %";
             lblFps.Text = $"{data.Fps:0.0}";
+
+            UpdateBigNumbers(txtCPUTemp,data.CpuTemp);
+            UpdateBigNumbers(txtGPUTemp,data.GpuTemp);
+            txtCpuFan.Text = (ASCIIART.AsciiArt.ConvertRatioToGauge(data.CpuFan / 20.0f, 5));
+            txtGpuFan.Text = (ASCIIART.AsciiArt.ConvertRatioToGauge(data.GpuFan / 20.0f, 5));
+        }
+
+
+        private void UpdateBigNumbers(View view, float value)
+        {
+            view.Text =  ASCIIART.AsciiArt.ConvertFloatToArt(value);
         }
 
         private void AddLog(string line)
