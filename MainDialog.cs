@@ -107,6 +107,8 @@ namespace TempAndFanServer
 
         private void ShowDashboard(bool visible = false)
         {
+            if (visible && windowSensors.Visible)
+                return;
             treeSensors.SelectedObject = null;
             foreach (var window in fullViewWindows)
             {
