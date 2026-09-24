@@ -9,19 +9,23 @@ namespace ASCIIART
 
 
         // value varries from 0 to 10 
-        public static string ConvertRatioToGauge(float valueF,int max)
+        public static string ConvertRatioToGauge(float valueF, int max,bool vertical = true)
         {
             var value = (int)Math.Round(valueF);
             List<string> gauge = [];
             for (int i = 0; i < max; i++)
             {
                 if (i < (max - value))
-                    gauge.Add(EmptyBar);
+                    gauge.Add(vertical ? EmptyBar : EmptyBarH);
                 else
-                    gauge.Add(OneBar);
+                    gauge.Add(vertical ? OneBar : OneBarH);
             }
-            return string.Join(Environment.NewLine, gauge);
+            if (!vertical)
+                gauge.Reverse();
+            return string.Join(vertical ? Environment.NewLine : "", gauge);
         }
+
+
 
         public static string ConvertFloatToArt(float value, int precision = 1)
         {
@@ -82,6 +86,8 @@ namespace ASCIIART
 
         private static readonly string EmptyBar = "        ";
         private static readonly string OneBar = "■▄▄■";
+        private static readonly string OneBarH = "▐";
+        private static readonly string EmptyBarH = "░";
         private static readonly string dot =
 """
          

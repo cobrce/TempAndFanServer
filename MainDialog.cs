@@ -101,8 +101,32 @@ namespace TempAndFanServer
             fullViewWindows.Add(windowSensors);
             fullViewWindows.Add(windowLog);
             fullViewWindows.Add(windowStats);
+            CreateSimpleSatusBar();
             ShowDashboard(false);
         }
+
+        private StatusBar simpleStatusBar;
+        private void CreateSimpleSatusBar()
+        {
+            simpleStatusBar = new StatusBar()
+            {
+                Width = Dim.Fill(0),
+                Height = 1,
+                X = 0,
+                Y = Pos.AnchorEnd(1),
+                Visible = false,
+                Data = "SimpleStatusBar",
+                Text ="",
+                TextAlignment = TextAlignment.Right,
+                ColorScheme = greyOnBlack
+            };
+            simpleStatusBar.Items = new StatusItem[]
+            {
+                new StatusItem((Key)(0),"Alt+D to quit dashboard",null)
+            };
+            this.Add(simpleStatusBar);
+        }
+
         List<Window> fullViewWindows = new List<Window>();
 
         private void ShowDashboard(bool visible = false)
@@ -116,6 +140,9 @@ namespace TempAndFanServer
                     continue;
                 window.Visible = !visible;
             }
+
+            simpleStatusBar.Visible = visible;
+            statusBar.Visible = !visible;
             
             frameDashboard.Visible = visible;
             frameDashboard.X = Pos.Center();
@@ -403,14 +430,22 @@ namespace TempAndFanServer
         {
             lblCPUTemp.Text = $"{data.CpuTemp:0.00} °C";
             lblCPUFan.Text = $"{data.CpuFan:0.00} %";
-            lblGPUTemp.Text = $"{data.GpuTemp:0.00} °C";
+            lblCPUFan2.Text = $"{(data.CpuFan > 99 ? 99 : (int)data.CpuFan)}%";
+            lblGPUTemp.Text  = $"{data.GpuTemp:0.00} °C";
             lblGPUFan.Text = $"{data.GpuFan:0.00} %";
+            lblGPUFan2.Text = $"{(data.GpuFan > 99 ? 99 : (int)data.GpuFan)}%";
             lblFps.Text = $"{data.Fps:0.0}";
 
             UpdateBigNumbers(txtCPUTemp,data.CpuTemp);
             UpdateBigNumbers(txtGPUTemp,data.GpuTemp);
-            txtCpuFan.Text = (ASCIIART.AsciiArt.ConvertRatioToGauge(data.CpuFan / 20.0f, 5));
-            txtGpuFan.Text = (ASCIIART.AsciiArt.ConvertRatioToGauge(data.GpuFan / 20.0f, 5));
+
+            if (!txtCpuFan.GetCurrentWidth(out int cpuFanCurrentWidth))
+                cpuFanCurrentWidth = 53;
+            if (!txtGpuFan.GetCurrentWidth(out int gpuFanCurrentWidth))
+                gpuFanCurrentWidth =53;
+
+            txtCpuFan.Text = (ASCIIART.AsciiArt.ConvertRatioToGauge(data.CpuFan * (float)cpuFanCurrentWidth / 100.0f, cpuFanCurrentWidth, false));
+            txtGpuFan.Text = (ASCIIART.AsciiArt.ConvertRatioToGauge(data.GpuFan * (float)gpuFanCurrentWidth / 100.0f, gpuFanCurrentWidth, false));
         }
 
 
